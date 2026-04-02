@@ -22,6 +22,8 @@ import {
 import { fetchRoles } from '../../services/roles';
 import { fetchTechnologies } from '../../services/technologies';
 import { Editor } from '../../components/Editor';
+import { htmlToPlainText } from '../../utils/caseExcerpt';
+import { normalizeHtmlFragment } from '../../utils/normalizeHtmlFragment';
 
 // Управление кейсами с rich-text редактором
 const { Title } = Typography;
@@ -32,6 +34,7 @@ const CasesAdminPage: React.FC = () => {
   const [technologies, setTechnologies] = useState<Technology[]>([]);
   const [loading, setLoading] = useState(false);
   const [editing, setEditing] = useState<Case | null>(null);
+  const [summary, setSummary] = useState('');
   const [description, setDescription] = useState('');
   const [effect, setEffect] = useState('');
   const [form] = Form.useForm();
@@ -62,11 +65,16 @@ const CasesAdminPage: React.FC = () => {
     technologyIds?: number[];
   }) => {
     try {
+      const summaryHtml = normalizeHtmlFragment(summary);
+      const summaryPayload = htmlToPlainText(summaryHtml).trim()
+        ? summaryHtml
+        : null;
       if (editing) {
         await updateCase(editing.id, {
           title: values.title,
           roleId: values.roleId,
           technologyIds: values.technologyIds,
+          summary: summaryPayload,
           description,
           effect
         });
@@ -76,6 +84,7 @@ const CasesAdminPage: React.FC = () => {
           title: values.title,
           roleId: values.roleId,
           technologyIds: values.technologyIds,
+          summary: summaryPayload,
           description,
           effect
         });
@@ -84,6 +93,7 @@ const CasesAdminPage: React.FC = () => {
 
       setEditing(null);
       form.resetFields();
+      setSummary('');
       setDescription('');
       setEffect('');
       await loadData();
@@ -99,6 +109,7 @@ const CasesAdminPage: React.FC = () => {
       roleId: c.role.id,
       technologyIds: c.technologies?.map((t) => t.technology.id)
     });
+    setSummary(c.summary || '');
     setDescription(c.description);
     setEffect(c.effect);
   };
@@ -187,6 +198,14 @@ const CasesAdminPage: React.FC = () => {
                 }))}
               />
             </Form.Item>
+            <Form.Item label="Краткое описание для главной">
+              <Editor
+                value={summary}
+                onChange={setSummary}
+                placeholder="Краткий текст для карточки на главной"
+                defaultHtmlMode={summary.includes('<')}
+              />
+            </Form.Item>
             <Form.Item label="Описание">
               <Editor
                 value={description}
@@ -211,6 +230,7 @@ const CasesAdminPage: React.FC = () => {
                     onClick={() => {
                       setEditing(null);
                       form.resetFields();
+                      setSummary('');
                       setDescription('');
                       setEffect('');
                     }}

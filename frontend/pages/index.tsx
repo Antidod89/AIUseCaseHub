@@ -12,7 +12,6 @@ import {
   Typography,
   message
 } from 'antd';
-import Link from 'next/link';
 import { Case, Role, Technology } from '../types';
 import {
   createCase,
@@ -29,73 +28,16 @@ import {
 } from '../services/technologies';
 import { Pagination } from '../components/Pagination';
 import { CaseCard } from '../components/CaseCard';
+import { CaseSummaryCard } from '../components/CaseSummaryCard';
 import { Editor } from '../components/Editor';
 import { useAuth } from '../context/AuthContext';
+import { htmlToPlainText } from '../utils/caseExcerpt';
+import { normalizeHtmlFragment } from '../utils/normalizeHtmlFragment';
 
-// Публичная страница: сверху роли, затем один кейс и его технологии
+// Публичная страница: роли, список кейсов (кратко), пагинация по 10 записей
 const { Title } = Typography;
 
-const PAGE_SIZE = 1;
-
-// Нормализация HTML-фрагмента: убираем DOCTYPE, html/head/body
-// и «заворачиваем» стили так, чтобы они работали только внутри .rich-html.
-const normalizeHtmlFragment = (html: string) => {
-  if (!html) return '';
-  // Если это полноценная страница (doctype/html/body),
-  // ничего не трогаем — она будет рендериться в iframe изолированно.
-  if (/<!DOCTYPE/i.test(html) || /<html[^>]*>/i.test(html) || /<body[^>]*>/i.test(html)) {
-    return html.trim();
-  }
-
-  let cleaned = html;
-
-  // Собираем все стили, где бы они ни были (в head или body)
-  const styleBlocks: string[] = [];
-  cleaned = cleaned.replace(/<style[\s\S]*?<\/style>/gi, (match) => {
-    const css = match
-      .replace(/<style[^>]*>/i, '')
-      .replace(/<\/style>/i, '');
-    styleBlocks.push(css);
-    return '';
-  });
-
-  // DOCTYPE
-  cleaned = cleaned.replace(/<!DOCTYPE[\s\S]*?>/gi, '');
-  // <head>...</head>
-  cleaned = cleaned.replace(/<head[\s\S]*?<\/head>/gi, '');
-  // <html>, </html>, <body>, </body>
-  cleaned = cleaned
-    .replace(/<html[^>]*>/gi, '')
-    .replace(/<\/html>/gi, '')
-    .replace(/<body[^>]*>/gi, '')
-    .replace(/<\/body>/gi, '');
-
-  // Локализуем собранные стили, чтобы они применялись только внутри контейнера .rich-html
-  if (styleBlocks.length) {
-    let css = styleBlocks.join('\n');
-
-    // Специально заменяем body/html на .rich-html
-    css = css.replace(/\bbody\b/gi, '.rich-html');
-    css = css.replace(/\bhtml\b/gi, '.rich-html');
-    // Для остальных селекторов добавляем префикс .rich-html
-    css = css.replace(
-      /(^|})\s*([^@}{]+)\{/g,
-      (m, sep, selector) => {
-        const trimmed = (selector as string).trim();
-        if (!trimmed) return m;
-        // Если селектор уже начинается с .rich-html, не дублируем
-        if (/^\.rich-html\b/.test(trimmed)) {
-          return `${sep} ${trimmed}{`;
-        }
-        return `${sep} .rich-html ${trimmed}{`;
-      }
-    );
-
-    cleaned = `<style>${css}</style>${cleaned}`;
-  }
-
-  return cleaned.trim();
-};
+const PAGE_SIZE = 10;
 
 const HomePage: React.FC = () => {
   const [roles, setRoles] = useState<Role[]>([]);
@@ -118,6 +60,7 @@ const HomePage: React.FC = () => {
 
   const [isCaseModalOpen, setIsCaseModalOpen] = useState(false);
   const [editingCase, setEditingCase] = useState<Case | null>(null);
+  const [caseSummary, setCaseSummary] = useState('');
   const [caseDescription, setCaseDescription] = useState('');
   const [caseEffect, setCaseEffect] = useState('');
   const [caseTechnologiesHtml, setCaseTechnologiesHtml] = useState('');
@@ -149,7 +92,35 @@ const HomePage: React.FC = () => {
     })();
   }, [page, roleId]);
 
-  const currentCase = cases[0] || null;
+  const handleDeleteCase = async (c: Case) => {
+    try {
+      await deleteCase(c.id);
+      message.success('Кейс удалён');
+      const data: CasesPage = await fetchCases({
+        page,
+        pageSize: PAGE_SIZE,
+        roleId
+      });
+      if (data.items.length === 0 && page > 1) {
+        const newPage = page - 1;
+        setPage(newPage);
+        const dataPrev: CasesPage = await fetchCases({
+          page: newPage,
+          pageSize: PAGE_SIZE,
+          roleId
+        });
+        setCases(dataPrev.items);
+        setTotal(dataPrev.total);
+      } else {
+        setCases(data.items);
+        setTotal(data.total);
+      }
+    } catch (err: any) {
+      const apiMessage =
+        err?.response?.data?.message || 'Ошибка удаления кейса';
+      message.error(apiMessage);
+    }
+  };
 
   const previewCase: Case | null = (() => {
     const title = (caseForm.getFieldValue('title') as string) || editingCase?.title;
@@ -166,6 +137,7 @@ const HomePage: React.FC = () => {
     return {
       id: editingCase?.id ?? 0,
       title,
+      summary: caseSummary || editingCase?.summary || null,
       description: caseDescription,
       effect: caseEffect,
       author,
@@ -220,6 +192,7 @@ const HomePage: React.FC = () => {
   const openCreateCase = () => {
     setEditingCase(null);
     caseForm.resetFields();
+    setCaseSummary('');
     setCaseDescription('');
     setCaseEffect('');
     setCaseTechnologiesHtml('');
@@ -233,6 +206,7 @@ const HomePage: React.FC = () => {
       roleId: c.role.id,
       author: c.author || ''
     });
+    setCaseSummary(c.summary || '');
     setCaseDescription(c.description);
     setCaseEffect(c.effect);
     setCaseTechnologiesHtml(c.technologiesHtml || '');
@@ -245,6 +219,10 @@ const HomePage: React.FC = () => {
     author?: string;
   }) => {
     try {
+      const summaryHtml = normalizeHtmlFragment(caseSummary);
+      const summaryPayload = htmlToPlainText(summaryHtml).trim()
+        ? summaryHtml
+        : null;
       const descriptionHtml = normalizeHtmlFragment(caseDescription);
       const effectHtml = normalizeHtmlFragment(caseEffect);
       const technologiesHtml = normalizeHtmlFragment(caseTechnologiesHtml);
@@ -254,6 +232,7 @@ const HomePage: React.FC = () => {
           title: values.title,
           roleId: values.roleId,
           author: values.author,
+          summary: summaryPayload,
           description: descriptionHtml,
           effect: effectHtml,
           technologiesHtml
@@ -264,6 +243,7 @@ const HomePage: React.FC = () => {
           title: values.title,
           roleId: values.roleId,
           author: values.author,
+          summary: summaryPayload,
           description: descriptionHtml,
           effect: effectHtml,
           technologiesHtml
@@ -440,71 +420,29 @@ const HomePage: React.FC = () => {
         <Space
           style={{
             width: '100%',
-            justifyContent: 'space-between',
+            justifyContent: 'flex-end',
             alignItems: 'center'
           }}
         >
-          <div />
-          <Space>
-            {isEditorOrAdmin && (
-              <>
-                <Button onClick={openCreateCase}>Новый кейс</Button>
-                {currentCase && (
-                  <>
-                    <Button onClick={() => openEditCase(currentCase)}>
-                      Редактировать текущий кейс
-                    </Button>
-                    {isEditorOrAdmin && (
-                      <Popconfirm
-                        title="Удалить кейс?"
-                        description="Эту операцию нельзя будет отменить."
-                        okText="Да"
-                        cancelText="Нет"
-                        onConfirm={async () => {
-                          try {
-                            await deleteCase(currentCase.id);
-                            message.success('Кейс удалён');
-                            const data: CasesPage = await fetchCases({
-                              page,
-                              pageSize: PAGE_SIZE,
-                              roleId
-                            });
-                            if (data.items.length === 0 && page > 1) {
-                              const newPage = page - 1;
-                              setPage(newPage);
-                              const dataPrev: CasesPage = await fetchCases({
-                                page: newPage,
-                                pageSize: PAGE_SIZE,
-                                roleId
-                              });
-                              setCases(dataPrev.items);
-                              setTotal(dataPrev.total);
-                            } else {
-                              setCases(data.items);
-                              setTotal(data.total);
-                            }
-                          } catch (err: any) {
-                            const apiMessage =
-                              err?.response?.data?.message ||
-                              'Ошибка удаления кейса';
-                            message.error(apiMessage);
-                          }
-                        }}
-                      >
-                        <Button danger>Удалить текущий кейс</Button>
-                      </Popconfirm>
-                    )}
-                  </>
-                )}
-              </>
-            )}
-          </Space>
+          {isEditorOrAdmin && (
+            <Button onClick={openCreateCase}>Новый кейс</Button>
+          )}
         </Space>
       </Col>
 
       <Col span={24}>
-        {currentCase ? (
-          <CaseCard caseData={currentCase} />
+        {cases.length > 0 ? (
+          <Space direction="vertical" size={16} style={{ width: '100%' }}>
+            {cases.map((c) => (
+              <CaseSummaryCard
+                key={c.id}
+                caseData={c}
+                showAdminActions={!!isEditorOrAdmin}
+                onEdit={isEditorOrAdmin ? openEditCase : undefined}
+                onDelete={isEditorOrAdmin ? handleDeleteCase : undefined}
+              />
+            ))}
+          </Space>
         ) : (
           <Typography.Paragraph
             type="secondary"
@@ -609,7 +547,15 @@ const HomePage: React.FC = () => {
               }))}
             />
           </Form.Item>
-          <Form.Item label="Описание">
+          <Form.Item label="Краткое описание для списка на главной">
+            <Editor
+              value={caseSummary}
+              onChange={setCaseSummary}
+              placeholder="Краткий текст для карточки на главной"
+              defaultHtmlMode={caseSummary.includes('<')}
+            />
+          </Form.Item>
+          <Form.Item label="Описание (полное)">
             <Editor
               value={caseDescription}
               onChange={setCaseDescription}

@@ -28,6 +28,7 @@ export async function fetchCase(id: number) {
 // Создание кейса
 export async function createCase(payload: {
   title: string;
+  summary?: string | null;
   description: string;
   effect: string;
   author?: string;
@@ -44,6 +45,7 @@ export async function updateCase(
   id: number,
   payload: Partial<{
     title: string;
+    summary: string | null;
     description: string;
     effect: string;
     author: string;

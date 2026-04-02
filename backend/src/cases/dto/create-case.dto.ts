@@ -11,6 +11,10 @@ export class CreateCaseDto {
   @IsString()
   title: string;
 
+  @IsOptional()
+  @IsString()
+  summary?: string;
+
   @IsString()
   description: string;
 

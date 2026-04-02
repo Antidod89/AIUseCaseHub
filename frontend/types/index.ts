@@ -28,6 +28,7 @@ export interface CaseTechnologyRef {
 export interface Case {
   id: number;
   title: string;
+  summary?: string | null;
   description: string;
   effect: string;
   author?: string | null;

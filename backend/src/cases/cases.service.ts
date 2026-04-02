@@ -54,6 +54,7 @@ export class CasesService {
     const createdCase = await this.prisma.case.create({
       data: {
         title: dto.title,
+        summary: dto.summary ?? null,
         description: dto.description,
         effect: dto.effect,
         author: dto.author ?? null,
@@ -80,6 +81,8 @@ export class CasesService {
       where: { id },
       data: {
         title: dto.title ?? existing.title,
+        summary:
+          dto.summary !== undefined ? dto.summary ?? null : existing.summary,
         description: dto.description ?? existing.description,
         effect: dto.effect ?? existing.effect,
         author: dto.author ?? existing.author,
