@@ -1,0 +1,252 @@
+import React from 'react';
+import { Card, Tag, Typography } from 'antd';
+import { Transition, Label } from 'semantic-ui-react';
+import { Case } from '../types';
+
+// Карточка для отображения одного кейса и технологий
+const { Title, Paragraph, Text } = Typography;
+
+interface CaseCardProps {
+  caseData: Case;
+}
+
+export const CaseCard: React.FC<CaseCardProps> = ({ caseData }) => {
+  const makeIframeDoc = (html: string) =>
+    `<style>
+html, body { margin: 0; padding: 0; }
+.container, main, section, .content, .wrapper {
+  max-width: none !important;
+  width: 100% !important;
+}
+body > * {
+  max-width: none !important;
+  width: 100% !important;
+}
+</style>${html}`;
+
+  const handleIframeLoad = (event: React.SyntheticEvent<HTMLIFrameElement>) => {
+    try {
+      const iframe = event.currentTarget;
+      const doc = iframe.contentDocument || iframe.contentWindow?.document;
+      if (!doc) return;
+
+      const body = doc.body;
+      // Пытаемся найти "контейнер" контента, чтобы не тянуть пустой фон ниже
+      const mainEl =
+        (body.querySelector(
+          '.container, main, section, .content, .wrapper'
+        ) as HTMLElement | null) || body.firstElementChild;
+
+      let height: number;
+      if (mainEl) {
+        const rect = (mainEl as HTMLElement).getBoundingClientRect();
+        height = rect.bottom + 16; // небольшой отступ
+      } else {
+        height = doc.documentElement.scrollHeight || body.scrollHeight;
+      }
+
+      iframe.style.height = `${Math.max(0, Math.ceil(height))}px`;
+    } catch {
+      // игнорируем ошибки доступа
+    }
+  };
+  const hasEffect = !!caseData.effect && caseData.effect.trim() !== '';
+  const hasTechnologiesHtml =
+    !!caseData.technologiesHtml && caseData.technologiesHtml.trim() !== '';
+  const hasTechnologiesList =
+    Array.isArray(caseData.technologies) && caseData.technologies.length > 0;
+  const hasTechnologies = hasTechnologiesHtml || hasTechnologiesList;
+
+  return (
+    <Transition animation="fade up" duration={350} visible>
+      <Card
+        bordered
+        style={{
+          borderRadius: 12,
+          borderColor: 'var(--border-subtle)',
+          background: 'var(--bg-card-soft)',
+          boxShadow:
+            '0 10px 15px -3px rgba(15,23,42,0.12), 0 4px 6px -4px rgba(15,23,42,0.1)'
+        }}
+        bodyStyle={{ padding: 24 }}
+      >
+        <div
+          style={{
+            marginBottom: 20,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            borderBottom: '1px solid var(--border-subtle)',
+            paddingBottom: 8
+          }}
+        >
+          <div>
+            <Title
+              level={3}
+              style={{
+                marginBottom: 4,
+                fontWeight: 700
+              }}
+            >
+              {caseData.title}
+            </Title>
+            {caseData.author && (
+              <Text
+                style={{
+                  fontSize: 13,
+                  fontWeight: 600,
+                  color: '#16a34a'
+                }}
+              >
+                Автор кейса:{' '}
+                <span style={{ fontWeight: 700 }}>{caseData.author}</span>
+              </Text>
+            )}
+          </div>
+          {caseData.role?.name && (
+            <Label basic color="green">
+              {caseData.role.name}
+            </Label>
+          )}
+        </div>
+
+        <div style={{ marginBottom: 16 }}>
+          <Paragraph
+            style={{
+              marginBottom: 8,
+              fontSize: 16,
+              fontWeight: 600
+            }}
+          >
+            Описание
+          </Paragraph>
+          {caseData.description.includes('<style') ||
+          caseData.description.includes('<html') ||
+          caseData.description.includes('<body') ? (
+            <iframe
+              title={`case-description-${caseData.id}`}
+              srcDoc={makeIframeDoc(caseData.description)}
+              style={{
+                width: '100%',
+                border: 'none',
+                borderRadius: 8,
+                overflow: 'hidden',
+                background: 'transparent'
+              }}
+              scrolling="no"
+              onLoad={handleIframeLoad}
+              sandbox="allow-same-origin allow-scripts allow-popups allow-forms"
+            />
+          ) : (
+            <div
+              className="rich-html"
+              style={{ fontSize: 14, lineHeight: 1.6 }}
+              dangerouslySetInnerHTML={{ __html: caseData.description }}
+            />
+          )}
+        </div>
+
+        {hasEffect && (
+          <>
+            <div style={{ marginBottom: 4 }}>
+              <Text
+                strong
+                style={{
+                  display: 'block',
+                  marginBottom: 8,
+                  fontSize: 16
+                }}
+              >
+                Эффект применения кейса
+              </Text>
+            </div>
+            <div
+              style={{
+                marginBottom: 16,
+                padding: '12px 16px',
+                borderRadius: 8,
+                // Светло-зелёный фон для эффекта кейса
+                background: '#bbf7d0'
+              }}
+            >
+              {caseData.effect.includes('<style') ||
+              caseData.effect.includes('<html') ||
+              caseData.effect.includes('<body') ? (
+                <iframe
+                  title={`case-effect-${caseData.id}`}
+                  srcDoc={makeIframeDoc(caseData.effect)}
+                  style={{
+                    width: '100%',
+                    border: 'none',
+                    borderRadius: 6,
+                    overflow: 'hidden',
+                    background: 'transparent'
+                  }}
+                  scrolling="no"
+                  onLoad={handleIframeLoad}
+                  sandbox="allow-same-origin allow-scripts allow-popups allow-forms"
+                />
+              ) : (
+                <div
+                  className="rich-html"
+                  style={{ fontSize: 14, lineHeight: 1.6 }}
+                  dangerouslySetInnerHTML={{ __html: caseData.effect }}
+                />
+              )}
+            </div>
+          </>
+        )}
+
+        {hasTechnologies && (
+          <div>
+            <Text
+              strong
+              style={{
+                display: 'block',
+                marginBottom: 8,
+                fontSize: 16
+              }}
+            >
+              Используемые технологии
+            </Text>
+            {hasTechnologiesHtml ? (
+              caseData.technologiesHtml?.includes('<style') ||
+              caseData.technologiesHtml?.includes('<html') ||
+              caseData.technologiesHtml?.includes('<body') ? (
+                <iframe
+                  title={`case-tech-${caseData.id}`}
+                  srcDoc={makeIframeDoc(caseData.technologiesHtml || '')}
+                  style={{
+                    width: '100%',
+                    border: 'none',
+                    borderRadius: 6,
+                    overflow: 'hidden',
+                    background: 'transparent'
+                  }}
+                  scrolling="no"
+                  onLoad={handleIframeLoad}
+                  sandbox="allow-same-origin allow-scripts allow-popups allow-forms"
+                />
+              ) : (
+                <div
+                  className="rich-html"
+                  style={{ fontSize: 14, lineHeight: 1.6 }}
+                  dangerouslySetInnerHTML={{ __html: caseData.technologiesHtml || '' }}
+                />
+              )
+            ) : (
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                {caseData.technologies?.map((t) => (
+                  <Tag key={t.technology.id} color="blue">
+                    {t.technology.name}
+                  </Tag>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+      </Card>
+    </Transition>
+  );
+};
+

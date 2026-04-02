@@ -1,0 +1,61 @@
+datasource db {
+  // Используем SQLite, чтобы не ставить СУБД локально
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// Роль пользователя храним как строку (ADMIN | EDITOR | USER),
+// чтобы обойти ограничение SQLite на enum в Prisma
+model User {
+  id           Int      @id @default(autoincrement())
+  email        String   @unique
+  passwordHash String
+  role         String   @default("USER")
+  createdAt    DateTime @default(now())
+}
+
+model Role {
+  id          Int      @id @default(autoincrement())
+  name        String   @unique
+  description String?
+  cases       Case[]
+}
+
+model Case {
+  id           Int           @id @default(autoincrement())
+  title        String
+  description  String
+  effect       String
+  author       String?
+  technologiesHtml String?
+  role         Role          @relation(fields: [roleId], references: [id])
+  roleId       Int
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  technologies CaseTechnology[]
+}
+
+model Technology {
+  id           Int              @id @default(autoincrement())
+  name         String
+  description  String
+  link         String?
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
+  cases        CaseTechnology[]
+}
+
+model CaseTechnology {
+  caseId       Int
+  technologyId Int
+
+  case         Case       @relation(fields: [caseId], references: [id])
+  technology   Technology @relation(fields: [technologyId], references: [id])
+
+  @@id([caseId, technologyId])
+}
+

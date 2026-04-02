@@ -1,0 +1,148 @@
+@keyframes headerGradientMove {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@keyframes headerPulse {
+  0% {
+    opacity: 0.2;
+    transform: scale(0.98);
+  }
+  50% {
+    opacity: 0.9;
+    transform: scale(1.08);
+  }
+  100% {
+    opacity: 0.2;
+    transform: scale(0.98);
+  }
+}
+
+@keyframes headerTextGlow {
+  0% {
+    opacity: 0.15;
+    transform: translateY(0);
+    text-shadow: 0 0 12px rgba(56, 189, 248, 0.4);
+  }
+  50% {
+    opacity: 0.5;
+    transform: translateY(-4px);
+    text-shadow: 0 0 22px rgba(56, 189, 248, 0.9);
+  }
+  100% {
+    opacity: 0.15;
+    transform: translateY(0);
+    text-shadow: 0 0 12px rgba(56, 189, 248, 0.4);
+  }
+}
+
+.ai-header {
+  position: relative;
+  overflow: hidden;
+}
+
+.ai-header__bg {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 0% 0%, #22c55e22 0, transparent 55%),
+    radial-gradient(circle at 80% 0%, #38bdf822 0, transparent 55%),
+    radial-gradient(circle at 10% 80%, #a855f722 0, transparent 55%),
+    linear-gradient(90deg, #020617, #020617, #020617);
+  background-size: 220% 220%;
+  animation: headerGradientMove 12s ease-in-out infinite;
+  opacity: 0.98;
+}
+
+.ai-header__grid {
+  position: absolute;
+  inset: 0;
+  background-image: linear-gradient(
+      rgba(148, 163, 184, 0.18) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      90deg,
+      rgba(148, 163, 184, 0.18) 1px,
+      transparent 1px
+    );
+  background-size: 36px 36px;
+  mix-blend-mode: soft-light;
+  opacity: 0.7;
+}
+
+.ai-header__orb {
+  position: absolute;
+  width: 260px;
+  height: 260px;
+  border-radius: 999px;
+  background: radial-gradient(circle, #22c55e88 0, transparent 65%);
+  right: -40px;
+  top: -80px;
+  filter: blur(3px);
+  animation: headerPulse 9s ease-in-out infinite;
+}
+
+.ai-header__content {
+  position: relative;
+  z-index: 2;
+}
+
+.ai-header__words {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  color: #e5f2ff;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.ai-header__word-main {
+  font-size: 18px;
+  font-weight: 700;
+  animation: headerTextGlow 6.5s ease-in-out infinite;
+}
+
+.ai-header__word-sub {
+  font-size: 10px;
+  opacity: 0.7;
+  margin-top: 4px;
+  animation: headerTextGlow 9s ease-in-out infinite;
+  animation-delay: 0.6s;
+}
+
+.ai-header__row {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+
+.ai-header__row--alt {
+  opacity: 0.6;
+  font-size: 11px;
+}
+
+.ai-header__token {
+  white-space: nowrap;
+}
+
+
+/* Универсальный стиль для встраиваемого HTML-контента (кейсы, технологии) */
+.rich-html img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 8px 0;
+}
+
+
