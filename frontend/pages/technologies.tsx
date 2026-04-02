@@ -208,14 +208,7 @@ html, body { margin: 0; padding: 0; }
       <Row gutter={[16, 16]}>
         {currentItems.map((tech) => (
           <Col key={tech.id} span={24}>
-            <Card
-              bordered
-              style={{
-                borderRadius: 10,
-                borderColor: 'var(--border-subtle)',
-                background: 'var(--bg-card-soft)'
-              }}
-            >
+            <Card bordered className="hub-tech-card">
               <div>
                 <Title level={4}>
                   {tech.link ? (
@@ -325,14 +318,7 @@ html, body { margin: 0; padding: 0; }
           </div>
           {showPreview && previewTech && (
             <div style={{ marginBottom: 24 }}>
-              <Card
-                bordered
-                style={{
-                  borderRadius: 10,
-                  borderColor: 'var(--border-subtle)',
-                  background: 'var(--bg-card-soft)'
-                }}
-              >
+              <Card bordered className="hub-tech-card">
                 <Title level={4}>
                   {previewTech.link ? (
                     <a href={previewTech.link} target="_blank" rel="noreferrer">

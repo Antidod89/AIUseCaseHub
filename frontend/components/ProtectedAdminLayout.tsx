@@ -1,8 +1,10 @@
 import React, { useEffect } from 'react';
-import { Layout as AntLayout, Menu, Spin, Alert } from 'antd';
+import { Layout as AntLayout, Menu, Space, Spin, Alert } from 'antd';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useAuth } from '../context/AuthContext';
+import { useHubTheme } from '../context/ThemeContext';
+import { ThemeToggle } from './ThemeToggle';
 
 // Layout для защищённой админ-панели
 const { Header, Content } = AntLayout;
@@ -21,10 +23,13 @@ export const ProtectedAdminLayout: React.FC<{
 
   const isEditorOrAdmin =
     user && (user.role === 'ADMIN' || user.role === 'EDITOR');
+  const { theme: hubTheme } = useHubTheme();
+  const menuTheme = hubTheme === 'dark' ? 'dark' : 'light';
 
   if (loading || (!user && typeof window !== 'undefined')) {
     return (
       <div
+        className="hub-admin-shell"
         style={{
           height: '100vh',
           display: 'flex',
@@ -43,7 +48,7 @@ export const ProtectedAdminLayout: React.FC<{
 
   if (!isEditorOrAdmin) {
     return (
-      <AntLayout style={{ minHeight: '100vh' }}>
+      <AntLayout className="hub-admin-shell" style={{ minHeight: '100vh' }}>
         <Header
           style={{
             display: 'flex',
@@ -51,25 +56,28 @@ export const ProtectedAdminLayout: React.FC<{
             justifyContent: 'space-between'
           }}
         >
-          <div style={{ color: 'white', fontWeight: 600, fontSize: 18 }}>
+          <div className="hub-admin-shell__title">
             Управление пользователями
           </div>
-          <Menu
-            theme="dark"
-            mode="horizontal"
-            selectable={false}
-            items={[
-              { key: 'home', label: <Link href="/">Главная</Link> },
-              {
-                key: 'logout',
-                label: (
-                  <span onClick={() => void logout()}>
-                    Выход ({user.email})
-                  </span>
-                )
-              }
-            ]}
-          />
+          <Space size="middle">
+            <ThemeToggle variant="inline" />
+            <Menu
+              theme={menuTheme}
+              mode="horizontal"
+              selectable={false}
+              items={[
+                { key: 'home', label: <Link href="/">Главная</Link> },
+                {
+                  key: 'logout',
+                  label: (
+                    <span onClick={() => void logout()}>
+                      Выход ({user.email})
+                    </span>
+                  )
+                }
+              ]}
+            />
+          </Space>
         </Header>
         <Content style={{ padding: 24 }}>
           <Alert
@@ -83,7 +91,7 @@ export const ProtectedAdminLayout: React.FC<{
   }
 
   return (
-    <AntLayout style={{ minHeight: '100vh' }}>
+    <AntLayout className="hub-admin-shell" style={{ minHeight: '100vh' }}>
       <Header
         style={{
           display: 'flex',
@@ -91,28 +99,31 @@ export const ProtectedAdminLayout: React.FC<{
           justifyContent: 'space-between'
         }}
       >
-        <div style={{ color: 'white', fontWeight: 600, fontSize: 18 }}>
+        <div className="hub-admin-shell__title">
           Управление пользователями
         </div>
-        <Menu
-          theme="dark"
-          mode="horizontal"
-          selectable={false}
-          items={[
-            { key: 'dashboard', label: <Link href="/admin">Дэшборд</Link> },
-            { key: 'users', label: <Link href="/admin/users">Пользователи</Link> },
-            { key: 'technologies', label: <Link href="/technologies">Технологии</Link> },
-            { key: 'home', label: <Link href="/">Главная</Link> },
-            {
-              key: 'logout',
-              label: (
-                <span onClick={() => void logout()}>
-                  Выход ({user.email})
-                </span>
-              )
-            }
-          ]}
-        />
+        <Space size="middle">
+          <ThemeToggle variant="inline" />
+          <Menu
+            theme={menuTheme}
+            mode="horizontal"
+            selectable={false}
+            items={[
+              { key: 'dashboard', label: <Link href="/admin">Дэшборд</Link> },
+              { key: 'users', label: <Link href="/admin/users">Пользователи</Link> },
+              { key: 'technologies', label: <Link href="/technologies">Технологии</Link> },
+              { key: 'home', label: <Link href="/">Главная</Link> },
+              {
+                key: 'logout',
+                label: (
+                  <span onClick={() => void logout()}>
+                    Выход ({user.email})
+                  </span>
+                )
+              }
+            ]}
+          />
+        </Space>
       </Header>
       <Content style={{ padding: 24 }}>{children}</Content>
     </AntLayout>

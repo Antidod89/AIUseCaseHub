@@ -1,9 +1,12 @@
 import dynamic from 'next/dynamic';
 import React, { useMemo, useRef, useState } from 'react';
 import { Input, Space, Switch, Typography } from 'antd';
+import type ReactQuillClass from 'react-quill';
 
 // Динамический импорт редактора Quill (для SSR)
-const ReactQuill = dynamic(() => import('react-quill'), { ssr: false });
+// next/dynamic обрезает ref в типах; у класса react-quill ref нужен для getEditor() в handlers
+const ReactQuillRaw = dynamic(() => import('react-quill'), { ssr: false });
+const ReactQuill = ReactQuillRaw as unknown as typeof ReactQuillClass;
 
 interface EditorProps {
   value: string;

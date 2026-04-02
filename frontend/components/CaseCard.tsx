@@ -1,6 +1,6 @@
 import React from 'react';
-import { Card, Tag, Typography } from 'antd';
-import { Transition, Label } from 'semantic-ui-react';
+import { Button, Card, Space, Tag, Typography } from 'antd';
+import { Transition } from 'semantic-ui-react';
 import { Case } from '../types';
 
 // Карточка для отображения одного кейса и технологий
@@ -8,9 +8,10 @@ const { Title, Paragraph, Text } = Typography;
 
 interface CaseCardProps {
   caseData: Case;
+  onEdit?: (c: Case) => void;
 }
 
-export const CaseCard: React.FC<CaseCardProps> = ({ caseData }) => {
+export const CaseCard: React.FC<CaseCardProps> = ({ caseData, onEdit }) => {
   const makeIframeDoc = (html: string) =>
     `<style>
 html, body { margin: 0; padding: 0; }
@@ -61,13 +62,7 @@ body > * {
     <Transition animation="fade up" duration={350} visible>
       <Card
         bordered
-        style={{
-          borderRadius: 12,
-          borderColor: 'var(--border-subtle)',
-          background: 'var(--bg-card-soft)',
-          boxShadow:
-            '0 10px 15px -3px rgba(15,23,42,0.12), 0 4px 6px -4px rgba(15,23,42,0.1)'
-        }}
+        className="hub-case-card"
         bodyStyle={{ padding: 24 }}
       >
         <div
@@ -103,11 +98,16 @@ body > * {
               </Text>
             )}
           </div>
-          {caseData.role?.name && (
-            <Label basic color="green">
-              {caseData.role.name}
-            </Label>
-          )}
+          <Space align="center" size="middle" wrap style={{ flexShrink: 0 }}>
+            {onEdit && (
+              <Button type="default" onClick={() => onEdit(caseData)}>
+                Редактировать
+              </Button>
+            )}
+            {caseData.role?.name && (
+              <Tag className="hub-case-role-tag">{caseData.role.name}</Tag>
+            )}
+          </Space>
         </div>
 
         <div style={{ marginBottom: 16 }}>

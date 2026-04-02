@@ -2,6 +2,7 @@ import React from 'react';
 import { Button, Layout as AntLayout, Space } from 'antd';
 import Link from 'next/link';
 import { useAuth } from '../context/AuthContext';
+import { ThemeToggle } from './ThemeToggle';
 
 // Общий layout для публичных страниц
 const { Header, Content, Footer } = AntLayout;
@@ -12,7 +13,7 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({
   const { user, logout } = useAuth();
 
   return (
-    <AntLayout style={{ minHeight: '100vh', background: 'var(--bg-layout)' }}>
+    <AntLayout style={{ minHeight: '100vh', background: 'transparent' }}>
       <Header
         className="ai-header"
         style={{
@@ -51,6 +52,7 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({
             AI UseCase Hub
           </Link>
           <Space size="middle">
+            <ThemeToggle variant="header" />
             <Link href="/technologies">
               <Button
                 size="middle"
@@ -116,23 +118,21 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({
         </div>
       </Header>
       <Content
+        className="hub-content-surface"
         style={{
           padding: '32px 64px',
-          background: 'var(--bg-layout)'
+          background: 'transparent'
         }}
       >
         {children}
       </Content>
       <Footer
+        className="hub-site-footer"
         style={{
           marginTop: 32,
           padding: '16px 32px',
           textAlign: 'center',
-          background:
-            'linear-gradient(90deg, #020617 0%, #111827 40%, #020617 100%)',
-          color: '#9ca3af',
-          fontSize: 13,
-          borderTop: '1px solid rgba(15,23,42,0.8)'
+          fontSize: 13
         }}
       >
         makurinmv@lad24.ru · {new Date().getFullYear()}

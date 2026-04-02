@@ -6,6 +6,7 @@ const nextConfig = {
     'antd',
     '@ant-design/icons',
     '@ant-design/icons-svg',
+    '@rc-component/util',
     'rc-input',
     'rc-util',
     'rc-pagination',

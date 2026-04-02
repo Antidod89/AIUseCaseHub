@@ -1,0 +1,510 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Светлая тема по умолчанию */
+:root {
+  --bg-body: #f1f5f9;
+  --bg-layout: #f1f5f9;
+  --bg-layout-gradient: linear-gradient(
+    165deg,
+    #f8fafc 0%,
+    #f1f5f9 50%,
+    #e2e8f0 100%
+  );
+  --bg-card: #ffffff;
+  --bg-card-soft: #ffffff;
+  --bg-card-elevated: #f8fafc;
+  --border-subtle: rgba(15, 23, 42, 0.08);
+  --border-strong: rgba(37, 99, 235, 0.38);
+  --text-primary: #0f172a;
+  --text-muted: #64748b;
+  --hub-link: #2563eb;
+  --hub-radius: 12px;
+  --shadow-card: 0 4px 16px -4px rgba(15, 23, 42, 0.08),
+    0 2px 6px -2px rgba(15, 23, 42, 0.05);
+  --shadow-card-active: 0 0 0 1px rgba(37, 99, 235, 0.22),
+    0 12px 28px -8px rgba(37, 99, 235, 0.1);
+  --hub-control-bg: #ffffff;
+  --hub-control-bg-focus: #ffffff;
+  --hub-control-border: rgba(15, 23, 42, 0.14);
+  --hub-control-border-hover: rgba(15, 23, 42, 0.22);
+  --hub-btn-default-bg: #f8fafc;
+  --hub-btn-default-hover: #f1f5f9;
+  --hub-accent-soft: rgba(37, 99, 235, 0.08);
+  --hub-focus-ring: rgba(37, 99, 235, 0.2);
+  --footer-edge: #e2e8f0;
+  --footer-mid: #f1f5f9;
+}
+
+[data-theme='dark'] {
+  --bg-body: #020617;
+  --bg-layout: #020617;
+  --bg-layout-gradient: linear-gradient(
+    165deg,
+    #0f172a 0%,
+    #020617 42%,
+    #071018 100%
+  );
+  --bg-card: rgba(30, 41, 59, 0.92);
+  --bg-card-soft: rgba(30, 41, 59, 0.72);
+  --bg-card-elevated: rgba(51, 65, 85, 0.55);
+  --border-subtle: rgba(148, 163, 184, 0.2);
+  --border-strong: rgba(56, 189, 248, 0.42);
+  --text-primary: #e2e8f0;
+  --text-muted: #94a3b8;
+  --hub-link: #7dd3fc;
+  --shadow-card: 0 8px 28px -12px rgba(0, 0, 0, 0.55);
+  --shadow-card-active: 0 0 0 1px var(--border-strong),
+    0 14px 40px -14px rgba(56, 189, 248, 0.28);
+  --hub-control-bg: rgba(15, 23, 42, 0.92);
+  --hub-control-bg-focus: rgba(30, 41, 59, 0.98);
+  --hub-control-border: rgba(148, 163, 184, 0.45);
+  --hub-control-border-hover: rgba(186, 199, 216, 0.55);
+  --hub-btn-default-bg: rgba(51, 65, 85, 0.85);
+  --hub-btn-default-hover: rgba(71, 85, 105, 0.95);
+  --hub-accent-soft: rgba(56, 189, 248, 0.12);
+  --hub-focus-ring: rgba(56, 189, 248, 0.18);
+  --footer-edge: #1e293b;
+  --footer-mid: #0f172a;
+}
+
+html,
+body {
+  min-height: 100%;
+  background: var(--bg-layout-gradient);
+  background-color: var(--bg-body);
+  background-attachment: fixed;
+  color: var(--text-primary);
+}
+
+body {
+  margin: 0;
+}
+
+#__next {
+  min-height: 100vh;
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+/* Публичные страницы: область под шапкой */
+.hub-content-surface {
+  color: var(--text-primary);
+}
+
+.hub-content-surface .ant-typography {
+  color: var(--text-primary);
+}
+
+.hub-content-surface .ant-typography.ant-typography-secondary {
+  color: var(--text-muted) !important;
+}
+
+.hub-content-surface a:not(.ant-btn):not(.ant-pagination-item a):not(
+    .ant-pagination-item-link
+  ) {
+  color: var(--hub-link);
+}
+
+.hub-content-surface .ant-pagination .ant-pagination-item {
+  background: var(--bg-card-soft);
+  border-color: var(--border-subtle);
+}
+
+.hub-content-surface .ant-pagination .ant-pagination-item a {
+  color: var(--text-primary);
+}
+
+.hub-content-surface .ant-pagination .ant-pagination-item-active {
+  border-color: var(--border-strong);
+  background: var(--hub-accent-soft);
+}
+
+.hub-content-surface
+  .ant-pagination
+  .ant-pagination-prev
+  .ant-pagination-item-link,
+.hub-content-surface
+  .ant-pagination
+  .ant-pagination-next
+  .ant-pagination-item-link {
+  background: var(--bg-card-soft);
+  border-color: var(--border-subtle);
+  color: var(--text-primary);
+}
+
+.hub-content-surface .ant-pagination .ant-pagination-disabled .ant-pagination-item-link {
+  color: var(--text-muted);
+}
+
+/* Инпуты и кнопки */
+.hub-content-surface .ant-input-affix-wrapper,
+.hub-auth-card .ant-input-affix-wrapper,
+.hub-admin-shell .ant-input-affix-wrapper {
+  background: var(--hub-control-bg) !important;
+  border-color: var(--hub-control-border) !important;
+  color: var(--text-primary) !important;
+}
+
+.hub-content-surface .ant-input-affix-wrapper:hover,
+.hub-auth-card .ant-input-affix-wrapper:hover,
+.hub-admin-shell .ant-input-affix-wrapper:hover {
+  border-color: var(--hub-control-border-hover) !important;
+}
+
+.hub-content-surface .ant-input-affix-wrapper-focused,
+.hub-auth-card .ant-input-affix-wrapper-focused,
+.hub-admin-shell .ant-input-affix-wrapper-focused,
+.hub-content-surface .ant-input-affix-wrapper:focus-within,
+.hub-auth-card .ant-input-affix-wrapper:focus-within,
+.hub-admin-shell .ant-input-affix-wrapper:focus-within {
+  border-color: var(--border-strong) !important;
+  background: var(--hub-control-bg-focus) !important;
+  box-shadow: 0 0 0 2px var(--hub-focus-ring);
+}
+
+.hub-content-surface .ant-input-affix-wrapper .ant-input,
+.hub-auth-card .ant-input-affix-wrapper .ant-input,
+.hub-admin-shell .ant-input-affix-wrapper .ant-input {
+  background: transparent !important;
+  color: var(--text-primary) !important;
+}
+
+.hub-content-surface .ant-input-affix-wrapper .ant-input::placeholder,
+.hub-auth-card .ant-input-affix-wrapper .ant-input::placeholder,
+.hub-admin-shell .ant-input-affix-wrapper .ant-input::placeholder {
+  color: var(--text-muted) !important;
+  opacity: 1;
+}
+
+.hub-content-surface .ant-input-affix-wrapper .anticon,
+.hub-auth-card .ant-input-affix-wrapper .anticon,
+.hub-admin-shell .ant-input-affix-wrapper .anticon {
+  color: var(--text-muted) !important;
+}
+
+.hub-content-surface .ant-input-search .ant-input-group .ant-input-affix-wrapper,
+.hub-admin-shell .ant-input-search .ant-input-group .ant-input-affix-wrapper {
+  border-start-end-radius: 0;
+  border-end-end-radius: 0;
+}
+
+.hub-content-surface .ant-input-search > .ant-input-group > .ant-input-group-addon:last-child .ant-input-search-button,
+.hub-admin-shell .ant-input-search > .ant-input-group > .ant-input-group-addon:last-child .ant-input-search-button {
+  background: var(--hub-btn-default-bg) !important;
+  border-color: var(--hub-control-border) !important;
+  color: var(--text-primary) !important;
+  padding-inline: 14px;
+}
+
+.hub-content-surface
+  .ant-input-search
+  > .ant-input-group
+  > .ant-input-group-addon:last-child
+  .ant-input-search-button:hover,
+.hub-admin-shell
+  .ant-input-search
+  > .ant-input-group
+  > .ant-input-group-addon:last-child
+  .ant-input-search-button:hover {
+  background: var(--hub-btn-default-hover) !important;
+  border-color: var(--hub-control-border-hover) !important;
+  color: var(--text-primary) !important;
+}
+
+.hub-content-surface .ant-btn-default,
+.hub-auth-card .ant-btn-default,
+.hub-admin-shell .ant-btn-default {
+  background: var(--hub-btn-default-bg) !important;
+  border-color: var(--hub-control-border) !important;
+  color: var(--text-primary) !important;
+}
+
+.hub-content-surface .ant-btn-default:not(:disabled):hover,
+.hub-auth-card .ant-btn-default:not(:disabled):hover,
+.hub-admin-shell .ant-btn-default:not(:disabled):hover {
+  background: var(--hub-btn-default-hover) !important;
+  border-color: var(--hub-control-border-hover) !important;
+  color: var(--text-primary) !important;
+}
+
+.hub-content-surface .ant-btn-primary,
+.hub-auth-card .ant-btn-primary,
+.hub-admin-shell .ant-btn-primary {
+  font-weight: 600;
+  border-color: transparent;
+}
+
+.hub-content-surface .ant-btn-primary:not(:disabled):hover,
+.hub-auth-card .ant-btn-primary:not(:disabled):hover,
+.hub-admin-shell .ant-btn-primary:not(:disabled):hover {
+  filter: brightness(1.05);
+}
+
+.hub-content-surface .ant-btn-dangerous.ant-btn-default,
+.hub-admin-shell .ant-btn-dangerous.ant-btn-default {
+  color: #dc2626 !important;
+  border-color: rgba(220, 38, 38, 0.35) !important;
+  background: #fef2f2 !important;
+}
+
+.hub-content-surface .ant-btn-dangerous.ant-btn-default:not(:disabled):hover,
+.hub-admin-shell .ant-btn-dangerous.ant-btn-default:not(:disabled):hover {
+  color: #b91c1c !important;
+  border-color: rgba(220, 38, 38, 0.5) !important;
+  background: #fee2e2 !important;
+}
+
+[data-theme='dark'] .hub-content-surface .ant-btn-dangerous.ant-btn-default,
+[data-theme='dark'] .hub-admin-shell .ant-btn-dangerous.ant-btn-default {
+  color: #fecaca !important;
+  border-color: rgba(248, 113, 113, 0.55) !important;
+  background: rgba(127, 29, 29, 0.35) !important;
+}
+
+[data-theme='dark'] .hub-content-surface .ant-btn-dangerous.ant-btn-default:not(:disabled):hover,
+[data-theme='dark'] .hub-admin-shell .ant-btn-dangerous.ant-btn-default:not(:disabled):hover {
+  color: #fef2f2 !important;
+  border-color: rgba(252, 165, 165, 0.75) !important;
+  background: rgba(153, 27, 27, 0.45) !important;
+}
+
+/* Карточки ролей на главной */
+.hub-role-card {
+  border: 1px solid var(--border-subtle);
+  border-radius: 10px;
+  padding: 16px;
+  height: 140px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background: var(--bg-card-soft);
+  cursor: pointer;
+  box-shadow: var(--shadow-card);
+  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease,
+    background 0.18s ease;
+}
+
+.hub-role-card:hover {
+  border-color: var(--hub-control-border-hover);
+  background: var(--bg-card-elevated);
+  transform: translateY(-1px);
+}
+
+.hub-role-card--active {
+  border-color: var(--border-strong);
+  background: var(--hub-accent-soft);
+  box-shadow: var(--shadow-card-active);
+  transform: translateY(-2px);
+}
+
+.hub-role-card__title {
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.hub-role-card__description {
+  margin-top: 8px;
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  color: var(--text-muted);
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+/* Кейсы: превью и полная карточка */
+.hub-case-summary-card.ant-card,
+.hub-case-card.ant-card {
+  border-radius: var(--hub-radius) !important;
+  border-color: var(--border-subtle) !important;
+  background: var(--bg-card-soft) !important;
+  box-shadow: var(--shadow-card) !important;
+  overflow: hidden;
+}
+
+.hub-case-summary-card.ant-card:hover,
+.hub-case-card.ant-card:hover {
+  border-color: rgba(37, 99, 235, 0.28) !important;
+  box-shadow: var(--shadow-card-active) !important;
+}
+
+.hub-case-summary-card__admin {
+  border-left: 1px solid var(--border-subtle);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 8px;
+  flex-shrink: 0;
+  background: var(--bg-card-elevated);
+}
+
+/* Роль кейса: единый стиль в светлой / тёмной теме (вместо Semantic UI Label) */
+.hub-content-surface .hub-case-role-tag.ant-tag,
+.hub-case-card .hub-case-role-tag.ant-tag,
+.hub-case-summary-card .hub-case-role-tag.ant-tag {
+  margin: 0 !important;
+  padding: 4px 10px !important;
+  font-weight: 600;
+  font-size: 13px;
+  line-height: 1.4;
+  border-radius: 6px !important;
+  border: 1px solid var(--border-strong) !important;
+  background: var(--hub-accent-soft) !important;
+  color: var(--hub-link) !important;
+}
+
+/* Каталог технологий */
+.hub-tech-card.ant-card {
+  border-radius: 10px !important;
+  border-color: var(--border-subtle) !important;
+  background: var(--bg-card-soft) !important;
+  box-shadow: var(--shadow-card) !important;
+  transition: border-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.hub-tech-card.ant-card:hover {
+  border-color: rgba(37, 99, 235, 0.28) !important;
+  box-shadow: var(--shadow-card-active) !important;
+}
+
+/* Логин / регистрация */
+.hub-auth-page {
+  max-width: 400px;
+  margin: 80px auto;
+}
+
+.hub-auth-card.ant-card {
+  border-radius: var(--hub-radius) !important;
+  border: 1px solid var(--border-subtle) !important;
+  background: var(--bg-card) !important;
+  box-shadow: var(--shadow-card) !important;
+}
+
+.hub-auth-card .ant-typography {
+  color: var(--text-primary);
+}
+
+.hub-auth-card .ant-form-item-label > label {
+  color: var(--text-muted);
+}
+
+/* Админ-панель */
+.hub-admin-shell {
+  min-height: 100vh;
+  background: var(--bg-layout-gradient);
+  background-color: var(--bg-body);
+}
+
+.hub-admin-shell .ant-layout-header {
+  background: var(--bg-card) !important;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.hub-admin-shell .ant-layout-content {
+  background: transparent !important;
+  color: var(--text-primary);
+}
+
+.hub-admin-shell .ant-typography {
+  color: var(--text-primary);
+}
+
+.hub-admin-shell .ant-table {
+  background: transparent;
+  color: var(--text-primary);
+}
+
+.hub-admin-shell .ant-table-thead > tr > th {
+  background: var(--bg-card-elevated) !important;
+  color: var(--text-primary) !important;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.hub-admin-shell .ant-table-tbody > tr > td {
+  background: var(--bg-card-soft) !important;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.hub-admin-shell .ant-table-tbody > tr:hover > td {
+  background: var(--bg-card-elevated) !important;
+}
+
+.hub-admin-shell .ant-card {
+  background: var(--bg-card-soft) !important;
+  border-color: var(--border-subtle) !important;
+}
+
+.hub-admin-shell .ant-form-item-label > label {
+  color: var(--text-muted);
+}
+
+.hub-admin-shell .ant-pagination .ant-pagination-item {
+  background: var(--bg-card-soft);
+  border-color: var(--border-subtle);
+}
+
+.hub-admin-shell .ant-pagination .ant-pagination-item a {
+  color: var(--text-primary);
+}
+
+.hub-admin-shell__title {
+  font-weight: 600;
+  font-size: 18px;
+  color: var(--text-primary);
+}
+
+.hub-site-footer {
+  background: linear-gradient(
+    90deg,
+    var(--footer-edge) 0%,
+    var(--footer-mid) 50%,
+    var(--footer-edge) 100%
+  );
+  color: var(--text-muted);
+  border-top: 1px solid var(--border-subtle);
+}
+
+/* Модалки монтируются в document.body */
+body .ant-modal .ant-modal-content {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+}
+
+body .ant-modal .ant-modal-header {
+  background: transparent;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+body .ant-modal .ant-modal-title {
+  color: var(--text-primary);
+}
+
+body .ant-modal .ant-modal-close {
+  color: var(--text-muted);
+}
+
+body .ant-modal .ant-modal-footer {
+  border-top: 1px solid var(--border-subtle);
+}
+
+body .ant-modal .ant-form-item-label > label {
+  color: var(--text-muted);
+}
+
+/* HTML внутри карточек */
+.hub-content-surface .rich-html,
+.hub-case-card .rich-html,
+.hub-tech-card .rich-html {
+  color: var(--text-primary);
+}

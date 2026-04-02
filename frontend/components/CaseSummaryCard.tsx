@@ -1,7 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
-import { Button, Card, Popconfirm, Space, Typography } from 'antd';
-import { Label } from 'semantic-ui-react';
+import { Button, Card, Popconfirm, Space, Tag, Typography } from 'antd';
 import { Case } from '../types';
 import { excerptFromHtml, htmlToPlainText } from '../utils/caseExcerpt';
 
@@ -30,14 +29,7 @@ export const CaseSummaryCard: React.FC<CaseSummaryCardProps> = ({
   return (
     <Card
       bordered
-      style={{
-        borderRadius: 12,
-        borderColor: 'var(--border-subtle)',
-        background: 'var(--bg-card-soft)',
-        boxShadow:
-          '0 6px 12px -4px rgba(15,23,42,0.12), 0 2px 4px -2px rgba(15,23,42,0.08)',
-        overflow: 'hidden'
-      }}
+      className="hub-case-summary-card"
       styles={{ body: { padding: 0 } }}
     >
       <div style={{ display: 'flex', alignItems: 'stretch' }}>
@@ -64,9 +56,9 @@ export const CaseSummaryCard: React.FC<CaseSummaryCardProps> = ({
               {caseData.title}
             </Title>
             {caseData.role?.name && (
-              <Label basic color="green" style={{ flexShrink: 0 }}>
+              <Tag className="hub-case-role-tag" style={{ flexShrink: 0 }}>
                 {caseData.role.name}
-              </Label>
+              </Tag>
             )}
           </div>
           {caseData.author && (
@@ -104,16 +96,7 @@ export const CaseSummaryCard: React.FC<CaseSummaryCardProps> = ({
 
         {showAdminActions && onEdit && onDelete && (
           <div
-            style={{
-              borderLeft: '1px solid var(--border-subtle)',
-              padding: 16,
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'center',
-              gap: 8,
-              flexShrink: 0,
-              background: 'rgba(15,23,42,0.02)'
-            }}
+            className="hub-case-summary-card__admin"
             onClick={(e) => e.preventDefault()}
           >
             <Space direction="vertical" size="small" style={{ width: '100%' }}>

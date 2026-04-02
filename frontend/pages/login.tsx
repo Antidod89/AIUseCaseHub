@@ -27,13 +27,8 @@ const LoginPage: React.FC = () => {
   };
 
   return (
-    <div
-      style={{
-        maxWidth: 400,
-        margin: '80px auto'
-      }}
-    >
-      <Card>
+    <div className="hub-auth-page">
+      <Card className="hub-auth-card">
         <Title level={3}>Вход</Title>
         {error && (
           <Alert

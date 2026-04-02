@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
+import { useRouter } from 'next/router';
 import {
   Button,
   Form,
@@ -29,6 +30,7 @@ import { normalizeHtmlFragment } from '../../utils/normalizeHtmlFragment';
 const { Title } = Typography;
 
 const CasesAdminPage: React.FC = () => {
+  const router = useRouter();
   const [cases, setCases] = useState<Case[]>([]);
   const [roles, setRoles] = useState<Role[]>([]);
   const [technologies, setTechnologies] = useState<Technology[]>([]);
@@ -102,17 +104,42 @@ const CasesAdminPage: React.FC = () => {
     }
   };
 
-  const onEdit = (c: Case) => {
-    setEditing(c);
-    form.setFieldsValue({
-      title: c.title,
-      roleId: c.role.id,
-      technologyIds: c.technologies?.map((t) => t.technology.id)
-    });
-    setSummary(c.summary || '');
-    setDescription(c.description);
-    setEffect(c.effect);
-  };
+  const onEdit = useCallback(
+    (c: Case) => {
+      setEditing(c);
+      form.setFieldsValue({
+        title: c.title,
+        roleId: c.role.id,
+        technologyIds: c.technologies?.map((t) => t.technology.id)
+      });
+      setSummary(c.summary || '');
+      setDescription(c.description);
+      setEffect(c.effect);
+    },
+    [form]
+  );
+
+  useEffect(() => {
+    if (!router.isReady || loading || cases.length === 0) {
+      return;
+    }
+    const raw = router.query.edit;
+    const idStr =
+      typeof raw === 'string' ? raw : Array.isArray(raw) ? raw[0] : undefined;
+    if (!idStr) {
+      return;
+    }
+    const id = Number(idStr);
+    if (Number.isNaN(id) || id < 1) {
+      return;
+    }
+    const c = cases.find((x) => x.id === id);
+    if (!c) {
+      return;
+    }
+    onEdit(c);
+    void router.replace({ pathname: '/admin/cases' }, undefined, { shallow: true });
+  }, [router, router.isReady, loading, cases, router.query.edit, onEdit]);
 
   const onDelete = async (id: number) => {
     try {
