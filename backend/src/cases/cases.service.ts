@@ -1,4 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateCaseDto } from './dto/create-case.dto';
 import { UpdateCaseDto } from './dto/update-case.dto';
@@ -8,10 +9,77 @@ import { UpdateCaseDto } from './dto/update-case.dto';
 export class CasesService {
   constructor(private readonly prisma: PrismaService) {}
 
-  // Публичный список кейсов с пагинацией и фильтром по роли
-  async findAll(page = 1, pageSize = 10, roleId?: number) {
+  // Публичный список кейсов с пагинацией, фильтром по роли и поиском по тексту
+  // SQLite LOWER() не приводит кириллицу — регистронезависимый поиск делаем в Node (toLowerCase)
+  async findAll(page = 1, pageSize = 10, roleId?: number, q?: string) {
     const skip = (page - 1) * pageSize;
-    const where = roleId ? { roleId } : undefined;
+    const search = q?.trim();
+    const baseWhere: Prisma.CaseWhereInput = {};
+    if (roleId) {
+      baseWhere.roleId = roleId;
+    }
+
+    if (search) {
+      const needle = search.toLowerCase();
+      const lc = (s: string | null | undefined) => (s ?? '').toLowerCase();
+
+      const candidates = await this.prisma.case.findMany({
+        where: baseWhere,
+        select: {
+          id: true,
+          title: true,
+          summary: true,
+          description: true,
+          effect: true,
+          author: true,
+          createdAt: true,
+          technologies: {
+            select: {
+              technology: { select: { name: true } }
+            }
+          }
+        },
+        orderBy: { createdAt: 'desc' }
+      });
+
+      const matched = candidates.filter((c) => {
+        const blob = [
+          lc(c.title),
+          lc(c.summary),
+          lc(c.description),
+          lc(c.effect),
+          lc(c.author),
+          ...c.technologies.map((ct) => lc(ct.technology.name))
+        ].join('\n');
+        return blob.includes(needle);
+      });
+
+      const total = matched.length;
+      const pageIds = matched.slice(skip, skip + pageSize).map((c) => c.id);
+
+      if (!pageIds.length) {
+        return { total: 0, items: [] };
+      }
+
+      const items = await this.prisma.case.findMany({
+        where: { id: { in: pageIds } },
+        include: {
+          role: true,
+          technologies: {
+            include: {
+              technology: true
+            }
+          }
+        }
+      });
+
+      const order = new Map(pageIds.map((id, i) => [id, i]));
+      items.sort((a, b) => (order.get(a.id) ?? 0) - (order.get(b.id) ?? 0));
+
+      return { total, items };
+    }
+
+    const where: Prisma.CaseWhereInput = baseWhere;
 
     const [total, items] = await Promise.all([
       this.prisma.case.count({ where }),

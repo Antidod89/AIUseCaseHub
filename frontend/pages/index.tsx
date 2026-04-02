@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import {
   Button,
   Col,
@@ -46,6 +46,11 @@ const HomePage: React.FC = () => {
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
   const [roleId, setRoleId] = useState<number | undefined>(undefined);
+  const [caseSearchInput, setCaseSearchInput] = useState('');
+  const [caseSearch, setCaseSearch] = useState('');
+  const isFirstCaseSearchLayout = useRef(true);
+  /** Поиск выполняется по всем ролям; фильтр роли действует только без запроса */
+  const casesQueryRoleId = caseSearch ? undefined : roleId;
 
   const { user } = useAuth();
   const isEditorOrAdmin =
@@ -81,16 +86,32 @@ const HomePage: React.FC = () => {
   }, []);
 
   useEffect(() => {
+    const t = window.setTimeout(() => {
+      setCaseSearch(caseSearchInput.trim());
+    }, 350);
+    return () => window.clearTimeout(t);
+  }, [caseSearchInput]);
+
+  useLayoutEffect(() => {
+    if (isFirstCaseSearchLayout.current) {
+      isFirstCaseSearchLayout.current = false;
+      return;
+    }
+    setPage(1);
+  }, [caseSearch]);
+
+  useEffect(() => {
     void (async () => {
       const data: CasesPage = await fetchCases({
         page,
         pageSize: PAGE_SIZE,
-        roleId
+        roleId: casesQueryRoleId,
+        q: caseSearch || undefined
       });
       setCases(data.items);
       setTotal(data.total);
     })();
-  }, [page, roleId]);
+  }, [page, caseSearch, casesQueryRoleId]);
 
   const handleDeleteCase = async (c: Case) => {
     try {
@@ -99,7 +120,8 @@ const HomePage: React.FC = () => {
       const data: CasesPage = await fetchCases({
         page,
         pageSize: PAGE_SIZE,
-        roleId
+        roleId: casesQueryRoleId,
+        q: caseSearch || undefined
       });
       if (data.items.length === 0 && page > 1) {
         const newPage = page - 1;
@@ -107,7 +129,8 @@ const HomePage: React.FC = () => {
         const dataPrev: CasesPage = await fetchCases({
           page: newPage,
           pageSize: PAGE_SIZE,
-          roleId
+          roleId: casesQueryRoleId,
+          q: caseSearch || undefined
         });
         setCases(dataPrev.items);
         setTotal(dataPrev.total);
@@ -254,7 +277,8 @@ const HomePage: React.FC = () => {
       const data: CasesPage = await fetchCases({
         page,
         pageSize: PAGE_SIZE,
-        roleId
+        roleId: casesQueryRoleId,
+        q: caseSearch || undefined
       });
       setCases(data.items);
       setTotal(data.total);
@@ -417,17 +441,24 @@ const HomePage: React.FC = () => {
       </Col>
 
       <Col span={24}>
-        <Space
-          style={{
-            width: '100%',
-            justifyContent: 'flex-end',
-            alignItems: 'center'
-          }}
-        >
-          {isEditorOrAdmin && (
-            <Button onClick={openCreateCase}>Новый кейс</Button>
-          )}
-        </Space>
+        <Row gutter={[16, 16]} align="middle" justify="center">
+          <Col xs={24} md={14} lg={10}>
+            <Input.Search
+              allowClear
+              size="middle"
+              placeholder="Поиск по кейсам"
+              value={caseSearchInput}
+              onChange={(e) => setCaseSearchInput(e.target.value)}
+            />
+          </Col>
+          <Col xs={24} md={6} lg={4} style={{ textAlign: 'center' }}>
+            {isEditorOrAdmin && (
+              <Button type="primary" onClick={openCreateCase}>
+                Новый кейс
+              </Button>
+            )}
+          </Col>
+        </Row>
       </Col>
 
       <Col span={24}>
@@ -453,7 +484,11 @@ const HomePage: React.FC = () => {
               fontSize: 16
             }}
           >
-            Еще нет ни одного кейса. Coming soon...
+            {caseSearch
+              ? 'По запросу ничего не найдено. Попробуйте другие слова.'
+              : roleId
+                ? 'В выбранной категории пока нет кейсов.'
+                : 'Еще нет ни одного кейса. Coming soon...'}
           </Typography.Paragraph>
         )}
       </Col>

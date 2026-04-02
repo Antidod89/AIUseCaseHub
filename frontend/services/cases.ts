@@ -11,10 +11,17 @@ export async function fetchCases(params: {
   page?: number;
   pageSize?: number;
   roleId?: number;
+  /** Поиск по названию, текстам кейса, автору и названиям технологий */
+  q?: string;
 }) {
-  const { page = 1, pageSize = 10, roleId } = params;
+  const { page = 1, pageSize = 10, roleId, q } = params;
   const { data } = await api.get<CasesPage>('/cases', {
-    params: { page, pageSize, roleId }
+    params: {
+      page,
+      pageSize,
+      roleId,
+      q: q?.trim() ? q.trim() : undefined
+    }
   });
   return data;
 }

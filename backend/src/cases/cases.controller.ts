@@ -29,12 +29,14 @@ export class CasesController {
   async findAll(
     @Query('page') page = '1',
     @Query('pageSize') pageSize = '10',
-    @Query('roleId') roleId?: string
+    @Query('roleId') roleId?: string,
+    @Query('q') q?: string
   ) {
     return this.casesService.findAll(
       Number(page),
       Number(pageSize),
-      roleId ? Number(roleId) : undefined
+      roleId ? Number(roleId) : undefined,
+      q
     );
   }
 
