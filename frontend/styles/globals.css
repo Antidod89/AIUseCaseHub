@@ -381,6 +381,27 @@ body {
   color: var(--hub-link) !important;
 }
 
+/* Краткое описание в каталоге: светло-зелёная плашка (в духе блока «Эффект») */
+.hub-case-summary-card .hub-case-summary-preview {
+  margin: 0;
+  padding: 8px 12px;
+  font-weight: 600;
+  font-size: 13px;
+  line-height: 1.55;
+  border-radius: 6px;
+  border: 1px solid var(--hub-case-effect-border);
+  background: var(--hub-case-effect-bg);
+  color: #15803d;
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+[data-theme='dark'] .hub-case-summary-card .hub-case-summary-preview {
+  color: #5eead4;
+}
+
 /* Каталог технологий */
 .hub-tech-card.ant-card {
   border-radius: 10px !important;

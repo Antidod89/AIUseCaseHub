@@ -4,7 +4,7 @@ import { Button, Card, Popconfirm, Space, Tag, Typography } from 'antd';
 import { Case } from '../types';
 import { excerptFromHtml, htmlToPlainText } from '../utils/caseExcerpt';
 
-const { Title, Paragraph, Text } = Typography;
+const { Title, Text } = Typography;
 
 interface CaseSummaryCardProps {
   caseData: Case;
@@ -75,16 +75,7 @@ export const CaseSummaryCard: React.FC<CaseSummaryCardProps> = ({
             </Text>
           )}
           {preview ? (
-            <Paragraph
-              type="secondary"
-              style={{
-                marginBottom: 0,
-                fontSize: 15,
-                lineHeight: 1.55
-              }}
-            >
-              {preview}
-            </Paragraph>
+            <span className="hub-case-summary-preview">{preview}</span>
           ) : null}
           <Text
             type="secondary"
