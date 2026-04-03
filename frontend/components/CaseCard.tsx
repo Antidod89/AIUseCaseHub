@@ -1,6 +1,7 @@
 import React from 'react';
 import { Button, Card, Space, Tag, Typography } from 'antd';
 import { Transition } from 'semantic-ui-react';
+import { useHubTheme } from '../context/ThemeContext';
 import { Case } from '../types';
 
 // Карточка для отображения одного кейса и технологий
@@ -12,9 +13,17 @@ interface CaseCardProps {
 }
 
 export const CaseCard: React.FC<CaseCardProps> = ({ caseData, onEdit }) => {
-  const makeIframeDoc = (html: string) =>
-    `<style>
-html, body { margin: 0; padding: 0; }
+  const { theme } = useHubTheme();
+  const makeIframeDoc = (html: string) => {
+    const dark = theme === 'dark';
+    const baseColor = dark ? '#e2e8f0' : '#0f172a';
+    return `<style>
+html, body {
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  color: ${baseColor};
+}
 .container, main, section, .content, .wrapper {
   max-width: none !important;
   width: 100% !important;
@@ -24,6 +33,7 @@ body > * {
   width: 100% !important;
 }
 </style>${html}`;
+  };
 
   const handleIframeLoad = (event: React.SyntheticEvent<HTMLIFrameElement>) => {
     try {
@@ -160,15 +170,7 @@ body > * {
                 Эффект применения кейса
               </Text>
             </div>
-            <div
-              style={{
-                marginBottom: 16,
-                padding: '12px 16px',
-                borderRadius: 8,
-                // Светло-зелёный фон для эффекта кейса
-                background: '#bbf7d0'
-              }}
-            >
+            <div className="hub-case-effect">
               {caseData.effect.includes('<style') ||
               caseData.effect.includes('<html') ||
               caseData.effect.includes('<body') ? (

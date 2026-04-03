@@ -35,6 +35,9 @@
   --hub-focus-ring: rgba(37, 99, 235, 0.2);
   --footer-edge: #e2e8f0;
   --footer-mid: #f1f5f9;
+  /* Блок «Эффект применения кейса» */
+  --hub-case-effect-bg: #ecfdf5;
+  --hub-case-effect-border: rgba(22, 163, 74, 0.28);
 }
 
 [data-theme='dark'] {
@@ -67,6 +70,8 @@
   --hub-focus-ring: rgba(56, 189, 248, 0.18);
   --footer-edge: #1e293b;
   --footer-mid: #0f172a;
+  --hub-case-effect-bg: rgba(15, 118, 110, 0.42);
+  --hub-case-effect-border: rgba(45, 212, 191, 0.4);
 }
 
 html,
@@ -336,6 +341,18 @@ body {
 .hub-case-card.ant-card:hover {
   border-color: rgba(37, 99, 235, 0.28) !important;
   box-shadow: var(--shadow-card-active) !important;
+}
+
+.hub-case-card .hub-case-effect {
+  margin-bottom: 16px;
+  padding: 12px 16px;
+  border-radius: 8px;
+  border: 1px solid var(--hub-case-effect-border);
+  background: var(--hub-case-effect-bg);
+}
+
+.hub-case-card .hub-case-effect .rich-html {
+  color: var(--text-primary);
 }
 
 .hub-case-summary-card__admin {
