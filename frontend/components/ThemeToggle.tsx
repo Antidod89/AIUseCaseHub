@@ -6,36 +6,38 @@ import { useHubTheme } from '../context/ThemeContext';
 type ThemeToggleProps = {
   /** Стиль как у кнопок в тёмной шапке сайта */
   variant?: 'header' | 'inline';
+  className?: string;
 };
 
 export const ThemeToggle: React.FC<ThemeToggleProps> = ({
-  variant = 'inline'
+  variant = 'inline',
+  className
 }) => {
   const { theme, toggleTheme } = useHubTheme();
   const isDark = theme === 'dark';
 
-  const headerStyle: React.CSSProperties =
-    variant === 'header'
-      ? {
-          borderRadius: 999,
-          borderColor: 'rgba(248,250,252,0.3)',
-          background: 'rgba(15,23,42,0.35)',
-          color: '#e5e7eb'
-        }
-      : {};
+  const btnClass =
+    [variant === 'header' ? 'ai-header__theme-btn' : '', className ?? '']
+      .filter(Boolean)
+      .join(' ') || undefined;
 
   return (
     <Tooltip title={isDark ? 'Светлая тема' : 'Тёмная тема'}>
       <Button
         type="default"
         shape="round"
+        className={btnClass}
         icon={isDark ? <SunOutlined /> : <MoonOutlined />}
         aria-label={isDark ? 'Включить светлую тему' : 'Включить тёмную тему'}
         onClick={toggleTheme}
         style={
           variant === 'header'
-            ? headerStyle
-            : { borderRadius: 999, display: 'inline-flex', alignItems: 'center' }
+            ? { borderRadius: 999 }
+            : {
+                borderRadius: 999,
+                display: 'inline-flex',
+                alignItems: 'center'
+              }
         }
       />
     </Tooltip>

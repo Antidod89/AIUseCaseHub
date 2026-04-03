@@ -20,9 +20,7 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({
           paddingInline: 0,
           paddingBlock: 6,
           minHeight: 80,
-          background: 'transparent',
-          boxShadow:
-            '0 10px 15px -3px rgba(15,23,42,0.6), 0 4px 6px -4px rgba(15,23,42,0.4)'
+          background: 'transparent'
         }}
       >
         <div className="ai-header__bg" />
@@ -39,16 +37,7 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({
             justifyContent: 'space-between'
           }}
         >
-          <Link
-            href="/"
-            style={{
-              color: 'white',
-              fontWeight: 600,
-              fontSize: 20,
-              marginRight: 24,
-              textDecoration: 'none'
-            }}
-          >
+          <Link href="/" className="ai-header__brand">
             AI UseCase Hub
           </Link>
           <Space size="middle">
@@ -57,12 +46,7 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({
               <Button
                 size="middle"
                 shape="round"
-                style={{
-                  borderRadius: 999,
-                  borderColor: 'rgba(248,250,252,0.3)',
-                  background: 'transparent',
-                  color: '#e5e7eb'
-                }}
+                className="ai-header__ghost"
               >
                 База технологий
               </Button>
@@ -72,12 +56,7 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({
                 <Button
                   size="middle"
                   shape="round"
-                  style={{
-                    borderRadius: 999,
-                    borderColor: 'rgba(248,250,252,0.3)',
-                    background: 'rgba(15,23,42,0.4)',
-                    color: '#e5e7eb'
-                  }}
+                  className="ai-header__ghost ai-header__ghost--filled"
                 >
                   Админ-панель
                 </Button>
@@ -101,15 +80,8 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({
               <Button
                 type="default"
                 shape="round"
+                className="ai-header__logout"
                 onClick={() => void logout()}
-                style={{
-                  borderRadius: 999,
-                  borderColor: 'rgba(248,250,252,0.3)',
-                  background: 'transparent',
-                  color: '#fca5a5',
-                  paddingInline: 18,
-                  fontSize: 13
-                }}
               >
                 Выход ({user.email})
               </Button>
